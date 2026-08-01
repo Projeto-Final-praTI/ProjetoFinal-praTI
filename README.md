@@ -78,7 +78,3 @@ ProjetoFinal-praTI/
 ## 📄 Licença
 
 Projeto acadêmico desenvolvido para fins educacionais.
-
-## Terceiro teste do Ruleset
-
-## Quarto Teste do RuleSet
