@@ -79,4 +79,3 @@ ProjetoFinal-praTI/
 
 Projeto acadêmico desenvolvido para fins educacionais.
 
-## Teste Pull Request
