@@ -79,6 +79,3 @@ ProjetoFinal-praTI/
 
 Projeto acadêmico desenvolvido para fins educacionais.
 
-## Segundo teste do Ruleset
-
-## Terceiro teste do RuleSet
