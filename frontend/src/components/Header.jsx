@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Header() {
   return (
     <header>
@@ -5,7 +7,10 @@ function Header() {
 
       <nav>
         <button>Menu</button>
-        <button>Login / Cadastro</button>
+
+        <Link to="/login">
+          Login / Cadastro
+        </Link>
       </nav>
     </header>
   );
