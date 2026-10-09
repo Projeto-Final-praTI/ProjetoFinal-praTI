@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import DenunciaModal from "../components/DenunciaModal.jsx";
 
 function Mapa() {
@@ -16,6 +17,10 @@ function Mapa() {
         Fazer denúncia
       </button>
 
+      <Link to="/denuncias/1">
+      Visualizar denúncia
+      </Link>
+
       {modalAberto && (
         <DenunciaModal
           onClose={() => setModalAberto(false)}
@@ -24,5 +29,6 @@ function Mapa() {
     </main>
   );
 }
+
 
 export default Mapa;
