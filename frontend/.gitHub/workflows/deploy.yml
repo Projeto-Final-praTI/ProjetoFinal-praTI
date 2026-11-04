@@ -3,7 +3,7 @@ name: Deploy Zello
 
 on:
   push:
-    branches: [/feature/main]
+    branches: [develop/feature]
   workflow_dispatch:
 
 permissions:
