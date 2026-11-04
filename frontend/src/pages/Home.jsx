@@ -27,7 +27,7 @@ function Home() {
       <section>
         {/* <h2>Mapa</h2> */}
         <div className="h-[20rem] relative rounded-[2rem] bg-[var(--cor-de-fundo-da-pagina-login)]">
-          <img src="/image/SVG.svg" alt="Imagem-do-map" className=" w-full h-full rounded-[2rem] object-cover relative"/>
+          <img src="image/SVG.svg" al="Imagem-do-map" className=" w-full h-full rounded-[2rem] object-cover relative"/>
           <p className="inline-block p-[.6rem] absolute left-[1.2rem] bottom-[1rem] border rounded-[2rem] text-[var(--cor-de-fundo-das-inputs)] bg-black">Mapa será exibido aqui.</p>
         </div>
       </section>
@@ -45,10 +45,10 @@ function Home() {
       </section>
       <nav className="inset-x-0 py-[2rem] flex justify-around absolute bottom-0 text-[var(--cor-de-fonte-do-cards)] bg-[var(--cor-de-fundo-das-inputs)]">
         <div>
-          <Link to="/perfil"><img src="/image/Button.svg" alt="icons-de-mapa"/></Link>
+          <Link to="/perfil"><img src="image/Button.svg" alt="icons-de-mapa"/></Link>
         </div>
         <div>
-          <Link to="/maps"><img src="/image/Button (1).svg" alt="Icons-de-perfil" /></Link>
+          <Link to="/maps"><img src="image/Button (1).svg" alt="Icons-de-perfil" /></Link>
         </div>
       </nav>
     </main>

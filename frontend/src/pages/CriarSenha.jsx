@@ -15,7 +15,7 @@ function CriarSenha(event){
     return(
         <div className='min-h-screen flex items-center justify-center'>
             <video autoPlay loop playsInline muted className='w-full h-full inset-0 fixed object-cover object-[25%_center] md:object-[40%_center] lg:object-[38%_center]'>
-                <source src="/video/zelo-background-nova-senha-chave.mp4" type="video/mp4"/>
+                <source src="video/zelo-background-nova-senha-chave.mp4" type="video/mp4"/>
             </video>
             <main className='mx-[2rem] relative sm:w-[94%] md:w-[92%] lg:w-[90%] xl:w-[64%]'>
                 <section className='w-full max-w-[50rem] my-[2rem] ml-auto p-[3rem] rounded-[.6rem] text-[var(--cor-de-fundo-das-inputs)] border-1 border-[var(--cor-concluido)]'>

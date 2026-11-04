@@ -19,7 +19,7 @@ function Login() {
     return (
       <div className="min-h-screen p-[.1rem] relative sm:min-h-[120rem]">
         <video autoPlay loop playsInline muted className="w-full h-full fixed object-cover">Navegador não carrega o vídeo
-          <source src="/video/zelo-background.mp4" type="video/mp4"/>
+          <source src="video/zelo-background.mp4" type="video/mp4"/>
         </video>
         <main className="w-full px-[2rem] relative z-1 sm:max-w-[50rem] sm:rounded-[1rem] sm:absolute sm:top-1/2 sm:left-1/2 sm:-translate-y-1/2 sm:-translate-x-1/2 sm:border-t-2 sm:border-t-[var(--cor-de-fundo-da-pagina-login)] sm:border-b-2 sm:border-b-[var(--cor-de-fundo-da-pagina-login)]">
           <h1 className="mt-[2rem] mb-[1rem] font-bold text-[3rem]">Entrar</h1>

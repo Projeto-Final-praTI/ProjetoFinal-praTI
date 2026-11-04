@@ -8,9 +8,9 @@ import "./style/resetar.css";
 import App from "./App.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </StrictMode>
+    <StrictMode>
+        <BrowserRouter basename="/ProjetoFinal-praTI">
+            <App />
+        </BrowserRouter>
+    </StrictMode>
 );

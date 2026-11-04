@@ -48,7 +48,7 @@ function Cadastro() {
   return (
     <div className="min-h-screen text-[var(--cor-de-fundo-das-inputs))]">
       <video autoPlay loop playsInline muted className="w-full h-full object-cover fixed">
-        <source src="/video/zelo-background-radar.mp4"/>  
+        <source src="video/zelo-background-radar.mp4"/>  
       </video>
       <main className="min-h-screen p-[2rem] md:flex items-center xl:min-h-[120vh]">
         <section className="max-w-[50rem] p-[2rem] relative z-1">

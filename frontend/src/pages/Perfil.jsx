@@ -11,8 +11,8 @@ function Perfil(){
     
     return(
         <div className="w-full relative min-h-screen sm:min-h-[120rem]">
-            <main className=" w-full p-[3rem] bg-[var(--cor-de-fundo-da-50rem] sm:w-[50rem] sm:absolute sm:top-1/2 sm:left-1/2 sm:-translate-y-1/2 sm:-translate-x-1/2 sm:border-1 sm:border-[var(--cor-de-fonte-do-cards)]">
-                <img className="block w-[15rem] m-auto" src="/image/zello-image.svg" alt="Imagem-do-Zelo" />
+            <main className=" w-full p-[3rem] rounded-[1rem] bg-[var(--cor-de-fundo-da-50rem] sm:w-[50rem] sm:absolute sm:top-1/2 sm:left-1/2 sm:-translate-y-1/2 sm:-translate-x-1/2 sm:border-1 sm:border-[var(--cor-de-fonte-do-cards)]">
+                <img className="block w-[15rem] m-auto" src="image/zello-image.svg" alt="Imagem-do-Zelo" />
                 <input className="block w-[14rem] h-[14rem] p-[.5rem] m-auto rounded-[50%] text-transparent bg-[url('/image/avatar-com-camera.png')] bg-cover" type="file" />
 
                 <b className="my-[3rem] uppercase text-[var(--cor-de-perfil)]">Perfil</b>
