@@ -1,0 +1,20 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+html,
+body,
+#root{
+    max-width: 100%;
+    margin: 0;
+    font-family: 'roboto';
+    font-size: 62.5%;
+    background-color: var(--cor-de-fundo-da-pagina-de-cadastro);
+}
+* {
+    font-size: 1.7rem;
+    box-sizing: border-box;
+}
+h1{
+    font-size: 2.4rem;
+}
