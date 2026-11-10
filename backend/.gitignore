@@ -1,0 +1,30 @@
+# Build
+target/
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# Uploads locais (imagens enviadas em runtime)
+uploads/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Variáveis de ambiente locais
+.env
+.env.local

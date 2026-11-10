@@ -1,0 +1,82 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/zelo_db}
+    username: ${DB_USER:zelo_user}
+    password: ${DB_PASSWORD:zelo_pass}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG10Dialect
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
+
+# Armazenamento local das imagens. Os arquivos são servidos em /uploads/**.
+storage:
+  local-path: ${STORAGE_LOCAL_PATH:./uploads}
+
+# Segredo de assinatura dos tokens JWT. Em produção, defina JWT_SECRET no ambiente.
+jwt:
+  secret: ${JWT_SECRET:zelo-dev-only-secret-key-change-me-before-production-32b}
+  expiration: ${JWT_EXPIRATION_MS:86400000}
+
+app:
+  # Origens permitidas por CORS, separadas por vírgula. Atrás de nginx/túnel o
+  # backend enxerga a requisição como interna; por isso o navegador precisa
+  # constar explicitamente nesta lista.
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWEDORIGINS:http://localhost:5173,https://zelo.apps.log.br}
+  # Base pública opcional das URLs de imagem. Vazio = URLs relativas.
+  public-base-url: ${PUBLIC_BASE_URL:}
+
+# Geocodificação reversa (coordenada -> município) usada para preencher a
+# cidade de um ponto crítico. Fonte: Nominatim/OpenStreetMap.
+geocoding:
+  base-url: ${GEOCODING_BASE_URL:https://nominatim.openstreetmap.org}
+
+# Regras do motor de alertas climáticos (fonte: previsão horária Open-Meteo).
+alerts:
+  rules:
+    rain-strong-mm: 7          # chuva forte: >= 7 mm em 1 hora (LARANJA)
+    rain-extreme-mm: 20        # chuva extrema: >= 20 mm em 1 hora (VERMELHO)
+    rain-accumulation-mm: 60   # acumulado: >= 60 mm em 24h (AMARELO)
+    heat-c: 35                 # onda de calor: >= 35°C em 24h (LARANJA)
+    heat-extreme-c: 38         # calor extremo: >= 38°C em 24h (VERMELHO)
+    cold-c: 2                  # quadro frio/geada: <= 2°C em 24h (AMARELO)
+    wind-strong-kmh: 60        # ventos intensos: >= 60 km/h (LARANJA)
+    wind-extreme-kmh: 90       # ventos fortes: >= 90 km/h (VERMELHO)
+
+server:
+  port: ${SERVER_PORT:8080}
+
+# Documentação interativa em /docs; descritor OpenAPI em /v3/api-docs.
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+    doc-expansion: none
+    display-request-duration: true
+    filter: true
+    try-it-out-enabled: true
+    persist-authorization: true
+    disable-swagger-default-url: true
+    display-query-params: true
+  default-produces-media-type: application/json
+  packages-to-scan: com.zelo.backend
+
+logging:
+  level:
+    com.zelo.backend: ${LOG_LEVEL_ZELO:INFO}
+    org.springframework.security: INFO

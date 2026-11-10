@@ -1,0 +1,11 @@
+# Contexto de build do Docker
+target/
+uploads/
+*.log
+
+# IDE / sistema
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
