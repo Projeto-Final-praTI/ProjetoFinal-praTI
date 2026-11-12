@@ -6,7 +6,6 @@ import type {
   IncidentResponseDTO,
   IncidentCommentDTO,
   IncidentStatus,
-  CurrentWeatherDTO,
   AlertsResponse,
   UserDTO,
   AdminStatsDTO,
@@ -182,5 +181,3 @@ export const moderationRejectMissingPersonAlert = (id: string, reason?: string) 
 
 export const moderationDeleteMissingPersonAlert = (id: string) =>
   api.delete<void>(`/moderation/missing-alerts/${id}`);
-
-export type { CurrentWeatherDTO };
