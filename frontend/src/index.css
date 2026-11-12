@@ -1,0 +1,425 @@
+@import "leaflet/dist/leaflet.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Camadas (z-index) do ZELO — CONTRATO ÚNICO
+   ------------------------------------------------------------
+   Toda a UI é posicionada sobre o mapa (Leaflet). O Leaflet cria
+   os próprios contextos empilhados (.leaflet-pane=400/500/600,
+   .leaflet-control=800), então as camadas do app são declaradas
+   como variáveis para não haver dois "mundos" de z-index. Use
+   sempre `z-[var(--z-...)]` em vez de números soltos, senão um
+   elemento acaba cobrindo o outro.
+
+     1   mapa (base)
+     10  painéis laterais (lista de pontos, drawer de detalhe)
+     30  barra de alerta climático
+     40  controles soltos sobre o mapa (linha do tempo, botão
+         "registrar", botão "minha localização")
+     50  barra do topo (header) + botão de alternar a lista
+     55  barra do topo enquanto uma ação de mapa está ativa
+     60  erros/ações do mapa (aviso de "aguardando localização")
+     100 modais e a gaveta lateral de detalhe (sobre o header)
+     120 modais aninhados (confirmação dentro de um modal)
+     130 avisos flutuantes (toasts) — acima de todo o resto
+   ============================================================ */
+:root {
+  /* ==========================================================
+     IDENTIDADE ZELO
+     ------------------------------------------------------------
+     Cores da identidade ZELO (marca e logo). Ficam como variáveis
+     para uso em CSS puro (slider, véu, animações) onde as classes
+     do Tailwind não alcançam.
+     ========================================================== */
+  --zelo-green: #1b8e5a;
+  --zelo-green-bright: #34a65f;
+  --zelo-green-dark: #0b3d28;
+  --zelo-blue: #2f86c9;
+  --zelo-blue-bright: #3e93c9;
+  --zelo-navy: #06365d;
+  --zelo-ink: #0f172a;
+  --zelo-muted: #4a5a61;
+  --zelo-surface: #f4f7f5;
+  --zelo-mist: #dce4e1;
+  --zelo-risk: #e8a33d;
+  --zelo-gradient: linear-gradient(100deg, #3e93c9 0%, #1b6b3e 100%);
+
+  --z-map: 1;
+  --z-side: 10;
+  --z-alert: 30;
+  --z-float: 40;
+  --z-header: 50;
+  --z-header-busy: 55;
+  --z-map-msg: 60;
+  --z-modal: 100;
+  --z-modal-top: 120;
+  --z-toast: 130;
+  /* Altura real da barra do topo. `top-14` (3.5rem) fica desatualizado
+     quando o conteúdo quebra em duas linhas no celular. */
+  --zelo-header-h: 56px;
+
+  /* ==========================================================
+     PILHA INFERIOR (celular) — evita sobreposição dos controles
+     ------------------------------------------------------------
+     No celular a base da tela é disputada por três controles:
+       linha do tempo (barra inteira no rodapé)
+       botão "registrar ponto crítico" (canto inferior direito)
+       botão "minha localização" (logo acima do anterior)
+     Cada um recebe uma altura/offset PRÓPRIO, calculado aqui.
+     Importante: offsets com `env()` NÃO podem ser classes
+     arbitrárias do Tailwind (`bottom-[calc(...env()...)]` não é
+     gerado pelo Tailwind) — por isso ficam em CSS puro + style inline.
+     ========================================================== */
+  --zelo-safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* Altura da linha do tempo no celular (2 linhas). O valor real é medido em
+     tempo de execução e publicado em --zelo-timeline-h (ver TimelineSlider),
+     porque a barra muda de altura conforme o conteúdo (contadores, avisos). */
+  --zelo-timeline-h: 125px;
+  /* Altura do botão "registrar" no celular (círculo 48px) */
+  --zelo-fab-h: 48px;
+  /* Altura do botão "minha localização" no celular (círculo 44px) */
+  --zelo-locate-h: 44px;
+  /* Folga entre os controles da pilha */
+  --zelo-stack-gap: 8px;
+  /* Botão "registrar": acima da linha do tempo */
+  --zelo-fab-bottom: calc(
+    var(--zelo-timeline-h) + var(--zelo-stack-gap) + var(--zelo-safe-bottom)
+  );
+  /* Botão "minha localização": acima do botão "registrar" */
+  --zelo-locate-bottom: calc(
+    var(--zelo-fab-bottom) + var(--zelo-fab-h) + var(--zelo-stack-gap)
+  );
+}
+
+@media (min-width: 768px) {
+  :root {
+    /* No desktop a linha do tempo é uma linha só e o botão "registrar" é
+       uma pílula à direita — a pilha muda de forma. */
+    --zelo-timeline-h: 68px;
+    --zelo-fab-h: 44px;
+    --zelo-locate-h: 44px;
+    --zelo-fab-bottom: 32px;
+    /* No desktop a pilha é: botão "registrar" (32) → zoom do Leaflet (88) →
+       botão "minha localização" (172, acima do zoom). */
+    --zelo-locate-bottom: 172px;
+  }
+}
+
+body {
+  @apply bg-zelo-surface text-slate-900;
+  margin: 0;
+  /* Impede o "puxar para atualizar" e o zoom por duplo toque no celular,
+     que atrapalham o arrasto do mapa. */
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  /* Textos longos (URLs, sequências sem espaço) quebram em vez de vazar
+     dos cartões, modais e gavetas. */
+  overflow-wrap: break-word;
+}
+
+#root {
+  @apply h-screen w-screen overflow-hidden relative;
+}
+
+/* Leaflet customizations */
+.leaflet-popup-content-wrapper {
+  @apply p-0 rounded-xl shadow-xl border-0;
+}
+.leaflet-popup-close-button {
+  @apply text-slate-600;
+}
+
+/* Botão "Minha localização".
+   No CELULAR ele fica no TOPO-ESQUERDA do mapa (logo abaixo da barra de
+   alerta): a base da tela é disputada pela linha do tempo e pelo botão
+   "registrar", e empilhar os dois ali deixava tudo grudado/ilegível.
+   No DESKTOP ele volta para o canto inferior direito, acima do zoom. */
+.zelo-locate-btn {
+  position: absolute;
+  z-index: calc(var(--z-float) + 1);
+}
+
+@media (max-width: 767px) {
+  .zelo-locate-btn {
+    top: calc(var(--zelo-header-h) + var(--zelo-alert-h, 0px) + 10px);
+    left: 12px;
+    bottom: auto !important;
+    right: auto !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .zelo-locate-btn {
+    bottom: var(--zelo-locate-bottom);
+    right: 16px;
+  }
+}
+
+/* Controles de zoom do Leaflet.
+   O Leaflet posiciona o controle dentro de um "canto" (`.leaflet-top.leaflet-left`),
+   que é um wrapper de tamanho ZERO — por isso `right`/`bottom` nele jogariam o
+   botão para fora da tela. Aqui o controle vira `position: fixed` e é
+   posicionado em relação à VIEWPORT:
+     - no CELULAR, no TOPO-direita (a base da tela é disputada pela linha do
+       tempo, pelo botão "registrar" e pelo botão "minha localização");
+     - no DESKTOP, no canto inferior direito, acima do botão "registrar". */
+.leaflet-control-zoom {
+  position: fixed !important;
+  top: calc(var(--zelo-header-h) + var(--zelo-alert-h, 0px) + 10px) !important;
+  right: 10px !important;
+  bottom: auto !important;
+  left: auto !important;
+  z-index: 800 !important;
+}
+
+@media (min-width: 768px) {
+  .leaflet-control-zoom {
+    top: auto !important;
+    bottom: 88px !important;
+    right: 12px !important;
+  }
+}
+
+/* Estilizar botões do Leaflet */
+.leaflet-control-zoom a {
+  @apply bg-white text-slate-700 border border-slate-200 shadow-lg;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.leaflet-control-zoom a:hover {
+  @apply bg-slate-50;
+}
+
+.leaflet-control-zoom a.leaflet-control-zoom-in {
+  margin-bottom: 4px;
+}
+
+/* Popup do Leaflet mais limpo */
+.leaflet-popup-content-wrapper {
+  @apply p-0 rounded-xl shadow-xl border-0;
+}
+.leaflet-popup-close-button {
+  @apply text-slate-600;
+}
+
+/* Slider da linha do tempo (TimelineSlider) — trilha/tempo único */
+.zelo-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border-radius: 9999px;
+}
+
+/* Dois marcadores sobrepostos: cada input deixa passar o clique só no polegar,
+   para que os dois possam ser arrastados independentemente. */
+.zelo-dual-range .zelo-range {
+  pointer-events: none;
+}
+.zelo-dual-range .zelo-range::-webkit-slider-runnable-track {
+  background: transparent;
+}
+.zelo-dual-range .zelo-range::-moz-range-track,
+.zelo-dual-range .zelo-range::-moz-range-progress {
+  background: transparent;
+}
+.zelo-dual-range .zelo-range::-webkit-slider-thumb {
+  pointer-events: auto;
+  margin-top: -6px;
+}
+.zelo-dual-range .zelo-range::-moz-range-thumb {
+  pointer-events: auto;
+}
+
+.zelo-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #1b8e5a var(--zelo-progress, 100%), #e2e8f0 var(--zelo-progress, 100%));
+}
+.zelo-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #1b8e5a;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+.zelo-range::-moz-range-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: #e2e8f0;
+}
+.zelo-range::-moz-range-progress {
+  height: 6px;
+  border-radius: 9999px;
+  background: #1b8e5a;
+}
+.zelo-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #1b8e5a;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+/* Animações */
+.cp-mask-input {
+  letter-spacing: 0.35ch;
+}
+
+.alert-banner {
+  animation: zeloAlertPulse 2s infinite ease-in-out;
+}
+
+@keyframes zeloAlertPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* ============================================================
+   Comportamentos globais / mobile
+   ============================================================ */
+
+/* Travar o scroll do fundo quando há modal, gaveta ou painel aberto.
+   `position: fixed` + top negativo preserva a posição sem "pular". */
+body.zelo-scroll-lock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Véu abaixo do header: escurece só a área do mapa quando um modal abre.
+   O header (não escurecido) tem --z-header > --z-modal, então continua
+   visível e clicável acima do véu; os modais ficam de propósito ABAIXO
+   dele para não cortar o topo do conteúdo em telas baixas. */
+.zelo-scrim {
+  position: fixed;
+  top: var(--zelo-header-h);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgb(11 61 40 / 0.55);
+  backdrop-filter: blur(4px);
+  animation: zeloFade 0.2s ease-out;
+}
+
+@keyframes zeloFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* O painel esquerdo e a linha do tempo criam contextos de empilhamento
+   com z-index baixo. Se o mapa (z-index 400 internamente) continuar no
+   mesmo contexto que eles, bolinhas e popups "furam" por cima dos
+   controles. `isolation` isola o contexto do mapa sem deslocá-lo. */
+.zelo-map-container {
+  isolation: isolate;
+  touch-action: pan-x pan-y;
+}
+
+/* Quando a lista de pontos críticos cobre a tela (celular), o mapa inteiro
+   fica escondido — o controle de zoom também some. */
+.zelo-map-covered .leaflet-control-zoom {
+  display: none !important;
+}
+
+/* Evita o zoom por duplo toque no celular, que briga com o arrasto do mapa */
+.leaflet-container {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-x pan-y;
+}
+
+/* ============================================================
+   Campos com borda em gradiente (identidade ZELO)
+   ------------------------------------------------------------
+   Fundo branco sólido e borda desenhada com o gradiente
+   azul→verde da marca. Fica como classe (e não utilitário
+   arbitrário) para não depender da geração de classes dinâmicas
+   pelo Tailwind.
+   ============================================================ */
+.zelo-field {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    var(--zelo-gradient) border-box;
+}
+
+/* Estados usados nas telas de autenticação: o campo fica verde quando
+   válido. O vermelho só aparece depois que algo foi digitado. */
+.zelo-field.is-valid {
+  border-color: var(--zelo-green-bright);
+  background: #fff;
+}
+
+.zelo-field.is-invalid {
+  border-color: #dc2626;
+  background: #fff;
+}
+
+.zelo-field:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 166, 95, 0.22);
+}
+
+.zelo-field.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.16);
+}
+
+.zelo-field:disabled {
+  opacity: 0.6;
+}
+
+/* ============================================================
+   Componentes compartilhados da identidade ZELO
+   ------------------------------------------------------------
+   Usados por modais, painel administrativo e formulários para que
+   todos tenham a mesma moldura, os mesmos campos e os mesmos
+   botões. A lógica de cada tela continua intacta: aqui só entram
+   cores, bordas, raios e estados de foco.
+   ============================================================ */
+@layer components {
+  .zelo-label {
+    @apply mb-1 block text-xs font-semibold text-zelo-muted;
+  }
+
+  .zelo-input {
+    @apply w-full rounded-lg border border-zelo-mist bg-white px-3 py-2 text-sm text-zelo-ink outline-none transition
+      placeholder:text-slate-400
+      focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .zelo-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition
+      hover:bg-emerald-700 active:scale-95
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .zelo-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-zelo-mist bg-white px-4 py-2 text-sm font-semibold text-zelo-muted transition
+      hover:bg-zelo-surface
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .zelo-btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition
+      hover:bg-red-700
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+}
+
