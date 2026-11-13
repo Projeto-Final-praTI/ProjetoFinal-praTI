@@ -1,5 +1,66 @@
-node_modules/
-target/
-.env
+# ============================================================
+# ZELO — arquivos que não devem ser versionados
+# ============================================================
+
+# --- Sistema operacional ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Editores e IDEs ---
 .idea/
 .vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+
+# --- Variáveis de ambiente e segredos ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+
+# --- Node.js / frontend ---
+node_modules/
+frontend/dist/
+frontend/.vite/
+dist-ssr/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Java / Maven / backend ---
+target/
+*.class
+*.jar
+!**/.mvn/wrapper/maven-wrapper.jar
+*.war
+hs_err_pid*
+replay_pid*
+dependency-reduced-pom.xml
+
+# --- Builds e logs ---
+build/
+out/
+*.log
+logs/
+
+# --- Uploads e mídia gerada em runtime ---
+uploads/
+backend/uploads/
+frontend/uploads/
+
+# --- Banco de dados: nunca versionar dumps com dados ---
+*.dump
+*.backup
+*-dump*.sql
+zelo_migrate.sql
+
+# --- Ferramentas locais ---
+docker-compose.override.yml
