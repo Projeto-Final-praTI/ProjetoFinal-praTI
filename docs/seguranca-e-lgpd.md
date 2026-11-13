@@ -110,6 +110,26 @@ Recomendações:
 Cada dado deve ter finalidade documentada e ser limitado ao necessário
 (minimização).
 
+### Compartilhamento com terceiros
+
+A ZELO envia dados a serviços externos para funcionalidades específicas:
+
+| Dado | Destino | Finalidade |
+|------|---------|------------|
+| Coordenada do mapa (lat/lng) | Open-Meteo | Previsão do tempo e alertas climáticos |
+| Coordenada do ponto ou nome da cidade | Nominatim/OSM | Geocodificação reversa e centro do município |
+| Sigla da UF | IBGE | Lista de municípios no seletor de cidade |
+| IP e região visualizada | Servidores de tiles do OSM | Renderização do mapa base no navegador |
+
+- Nenhum desses envios inclui nome, e-mail, CPF, token ou identificador do
+  usuário.
+- As coordenadas podem revelar a região de interesse ou a localização de uma
+  ocorrência; isso deve constar na Política de Privacidade.
+- Detalhes técnicos, limites e fallback estão em
+  [apis-externas.md](apis-externas.md).
+- Para uso real, prefira instâncias próprias ou provedores com contrato de
+  tratamento de dados.
+
 ---
 
 ## 6. Direitos dos titulares

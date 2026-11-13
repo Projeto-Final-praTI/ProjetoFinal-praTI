@@ -215,6 +215,9 @@ deve ser usada para login.
 | Ponto sem cidade | Nominatim indisponível | O registro é mantido sem cidade; root pode gerenciá-lo |
 | Build do frontend falha | Variável/import não utilizado | Remova ou use o símbolo; `tsc` é estrito |
 
+Para detalhes de limites, cache e fallback das integrações, consulte
+[apis-externas.md](apis-externas.md).
+
 ---
 
 ## 8. Parar e limpar

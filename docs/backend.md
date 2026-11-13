@@ -180,6 +180,9 @@ de ambiente.
 
 > O `JWT_SECRET` deve ter pelo menos 32 bytes. Nunca versione o segredo real.
 
+As integrações com Open-Meteo e Nominatim, incluindo URLs, limites, cache e
+fallback, estão detalhadas em [apis-externas.md](apis-externas.md).
+
 O schema é criado/atualizado por `spring.jpa.hibernate.ddl-auto=update`. Para
 produção, recomenda-se substituir por Flyway ou Liquibase.
 

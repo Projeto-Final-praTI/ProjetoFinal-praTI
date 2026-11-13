@@ -122,6 +122,10 @@ alteram informações.
 | **JWT** | Token assinado usado para autenticação stateless |
 | **Open-Meteo** | Serviço externo de previsão do tempo |
 | **Nominatim** | Serviço de geocodificação reversa do OpenStreetMap |
+| **IBGE** | API oficial de localidades usada no seletor de municípios |
+| **OSM Tiles** | Servidores que fornecem as imagens do mapa base |
+
+Detalhes das integrações em [apis-externas.md](apis-externas.md).
 
 ## 7. Indicadores de sucesso
 

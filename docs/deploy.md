@@ -226,6 +226,7 @@ Inclua o diretório de uploads no backup (ou migre para object storage).
 | Espaço em disco | monitore o volume de uploads e o banco |
 | Alertas climáticos | dependem do Open-Meteo; falhas não derrubam a API |
 | Geocodificação | dependem do Nominatim; falha mantém o ponto sem cidade |
+| APIs externas | ver [apis-externas.md](apis-externas.md) para limites, cache e fallback |
 
 Nunca inclua IPs internos, senhas ou tokens em issues, prints ou documentos do
 repositório.

@@ -95,6 +95,9 @@ frontend/
 | `CityPicker.tsx` | Seleção de estado/município com busca no IBGE |
 | `Scrim.tsx` | Véu compartilhado atrás de painéis e modais |
 
+As integrações de frontend — IBGE no `CityPicker` e tiles do OpenStreetMap no
+`MapView` — estão detalhadas em [apis-externas.md](apis-externas.md).
+
 ---
 
 ## 4. Rotas

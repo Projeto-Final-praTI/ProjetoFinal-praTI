@@ -36,7 +36,12 @@ flowchart LR
 | **Storage local** | Imagens de ocorrências e fotos de desaparecidos |
 | **Open-Meteo** | Fonte da previsão horária usada pelo motor de alertas |
 | **Nominatim** | Geocodificação reversa de coordenada para município |
+| **IBGE** | Lista de municípios por UF no seletor de cidade (frontend) |
+| **OSM Tiles** | Imagens do mapa base exibidas pelo Leaflet (frontend) |
 | **GitHub Actions** | Build e publicação do frontend (GitHub Pages) |
+
+Detalhes de chamadas, limites, cache, fallback e dados enviados a cada serviço
+estão em [apis-externas.md](apis-externas.md).
 
 ## 3. Arquitetura do frontend
 

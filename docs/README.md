@@ -20,6 +20,7 @@ inicial do projeto.
 | [Arquitetura](arquitetura.md) | Componentes, camadas, fluxos e topologia de implantação |
 | [Modelo de dados](modelo-de-dados.md) | Entidades, relacionamentos, enums e modelo PostGIS |
 | [API](api.md) | Referência dos endpoints, autenticação, erros e exemplos |
+| [APIs externas](apis-externas.md) | Open-Meteo, Nominatim, IBGE e tiles do OSM: uso, limites, fallback e privacidade |
 | [Frontend](frontend.md) | Estrutura React/TypeScript, rotas, componentes e build |
 | [Backend](backend.md) | Estrutura Spring Boot, segurança, regras e configuração |
 | [Instalação e execução](instalacao.md) | Pré-requisitos, banco, backend, frontend e solução de problemas |
