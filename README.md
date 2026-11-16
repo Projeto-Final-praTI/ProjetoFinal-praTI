@@ -1,54 +1,142 @@
-# Projeto Final +praTI (ZELO)
+# ZELO
 
-## Sobre o projeto
+**Zeladoria urbana colaborativa:** mapa de problemas da cidade, alertas de risco
+e central de pessoas desaparecidas em uma única plataforma georreferenciada.
 
-Aplicação web desenvolvida como trabalho final da trilha **Dev. Full Stack** da **+praTi & Codifica**. O projeto implementa uma plataforma colaborativa com mapa de ocorrências/pontos críticos, autenticação e autorização, moderação, alertas e painel administrativo.
+> Trabalho final da trilha **Dev. Full Stack 2026** da **+praTI & Codifica**.
 
-**Stack principal:** React + TypeScript + Vite (frontend), Spring Boot + Java 21 (backend), PostgreSQL + PostGIS (banco), Git/GitHub (versionamento).
+---
 
-## Requisitos atendidos (resumo)
+## Sobre
 
-- **CRUD:** operações de criação, leitura, atualização e exclusão em recursos da aplicação (ex.: incidentes/pontos críticos, comentários/confirmações/status, alertas e gestão administrativa).
-- **Autenticação e autorização:** cadastro/login com JWT, senhas com BCrypt, controle de acesso por papéis (RBAC) no backend.
-- **API RESTful:** endpoints documentados (Swagger/OpenAPI em `/docs` no backend) com validação e tratamento de erros.
-- **Banco relacional:** PostgreSQL + PostGIS com modelo documentado (`docs/modelo-de-dados.md`, `database/schema.sql`).
-- **Testes unitários e cobertura:**
-  - **Backend (JUnit 5 + Mockito + JaCoCo):** testes de serviços críticos de autenticação e CRUD/regras de negócio (`backend/src/test/java`), com verificação de cobertura mínima de 70% no `verify`.
-  - **Frontend (Jest + ts-jest):** testes unitários de lógica crítica (`frontend/src/__tests__`), com relatório/limiar de cobertura configurado.
-- **Documentação técnica:** instruções de execução, arquitetura, funcionalidades e decisões em `docs/`.
+Problemas de infraestrutura urbana — buracos, pontes comprometidas, alagamentos,
+quedas de árvore e deslizamentos — são percebidos primeiro por quem circula pela
+cidade. A ZELO centraliza esse fluxo: cidadãos registram ocorrências com foto e
+localização, a comunidade confirma e comenta, e equipes municipais acompanham e
+atualizam cada ponto.
 
-## Como executar localmente
+O acesso é público para consulta e exige autenticação para criar ou alterar
+informações. O sistema também reúne **alertas climáticos automáticos**, **alertas
+oficiais** da gestão e uma **central de pessoas desaparecidas** com moderação e
+pré-alertas por proximidade.
+
+---
+
+## Funcionalidades
+
+- **Mapa interativo** com pontos críticos, agrupamento de marcadores e filtro
+  temporal.
+- **Registro de ocorrências** com categoria, descrição, localização e 1 a 5
+  fotos, limitado a 500 m do local.
+- **Confirmação comunitária** idempotente e comentários.
+- **Linha do tempo de status** com autor, data e nota.
+- **Alertas climáticos** gerados a partir da previsão do tempo (chuva, calor,
+  frio e vento).
+- **Alertas oficiais** com severidade, raio e duração definidos pela gestão.
+- **Pessoas desaparecidas:** denúncia com foto, pré-alerta de 1 km por 10 min,
+  moderação, aprovação com alcance local/global e chat de avistamentos.
+- **Painel administrativo** com escopo por cidade e papéis `USER`, `FISCAL`,
+  `GESTOR` e `ROOT`.
+- **Consulta pública** de pontos, alertas e desaparecidos, sem cadastro.
+
+---
+
+## Stack
+
+| Camada | Tecnologias |
+|--------|-------------|
+| **Frontend** | React 18, TypeScript, Vite 5, Tailwind CSS, Leaflet + markercluster, Axios |
+| **Backend** | Java 21, Spring Boot 3.3, Spring Security + JWT, Spring Data JPA, Bean Validation, springdoc/OpenAPI |
+| **Banco de dados** | PostgreSQL 16 + PostGIS 3 |
+| **Integrações** | Open-Meteo, Nominatim/OpenStreetMap, IBGE Localidades e tiles do OSM |
+| **Infraestrutura** | Docker multi-stage, nginx e GitHub Actions (build + GitHub Pages) |
+
+Detalhes das integrações externas em [`docs/apis-externas.md`](docs/apis-externas.md).
+
+---
+
+## Estrutura do repositório
+
+```text
+ProjetoFinal-praTI/
+├── .github/          # Workflow de build e publicação do frontend
+├── backend/          # API REST em Spring Boot
+├── database/         # schema.sql e documentação do banco
+├── docs/             # Documentação técnica e funcional
+│   └── planejamento/ # Documentos históricos da fase de planejamento
+├── frontend/         # SPA em React + TypeScript
+├── .gitignore
+└── README.md
+```
+
+> As dependências Node ficam em [`frontend/package.json`](frontend/package.json);
+> o backend usa Maven, em [`backend/pom.xml`](backend/pom.xml). Não há projeto
+> Node na raiz do repositório.
+
+---
+
+## Como executar
 
 ### Pré-requisitos
-- Java 21, Maven 3.9+
-- Node.js 18+, npm 9+
-- PostgreSQL 16+ com PostGIS
 
-### 1) Banco de dados
+- **Java JDK 21** e **Maven 3.9**
+- **Node.js 18+** (recomendado 22 LTS) e npm
+- **PostgreSQL 16** com a extensão **PostGIS**
+
+### 1. Banco de dados
+
 ```sql
-CREATE DATABASE zelo_db;
-\c zelo_db
+CREATE DATABASE zelo_db\(; \c\) zelo_db
 CREATE EXTENSION IF NOT EXISTS postgis;
 ```
-> O schema é gerenciado pela aplicação/Hibernate (`ddl-auto=update`). Veja `docs/instalacao.md` para detalhes.
 
-### 2) Backend
+```bash
+psql -U zelo_user -d zelo_db -f database/schema.sql
+```
+
+O script cria apenas a estrutura — não contém dados pessoais.
+
+### 2. Backend
+
 ```bash
 cd backend
+
+export DB_URL="jdbc:postgresql://localhost:5432/zelo_db"
+export DB_USER="zelo_user"
+export DB_PASSWORD="sua-senha-local"
+export JWT_SECRET="uma-chave-forte-com-no-minimo-32-bytes"
+
 mvn spring-boot:run
 ```
+
+No Windows PowerShell, use `$env:DB_URL="..."` para cada variável.
+
 - API: `http://localhost:8080`
 - Swagger UI: `http://localhost:8080/docs`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 
-### 3) Frontend
+### 3. Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-- App: `http://localhost:5173` (proxy para `/api` e `/uploads`)
 
-> Guia completo: [`docs/instalacao.md`](docs/instalacao.md)
+Acesse `http://localhost:5173`. O Vite faz proxy de `/api` e `/uploads` para o
+backend.
+
+### 4. Build de verificação
+
+```bash
+cd frontend && npm run build && npm run test:filter
+cd backend && mvn -B clean package
+```
+
+Passo a passo completo, incluindo Docker e solução de problemas, em
+[`docs/instalacao.md`](docs/instalacao.md).
+
+---
 
 ## Testes e cobertura
 
@@ -69,47 +157,23 @@ npm run test:coverage
 npm run test:filter
 ```
 
+---
+
 ## Documentação
 
-- Visão geral: [`docs/visao-geral.md`](docs/visao-geral.md)
-- Instalação local: [`docs/instalacao.md`](docs/instalacao.md)
-- Arquitetura: [`docs/arquitetura.md`](docs/arquitetura.md)
-- API: [`docs/api.md`](docs/api.md)
-- Funcionalidades/requisitos: [`docs/requisitos.md`](docs/requisitos.md), [`docs/manual-do-usuario.md`](docs/manual-do-usuario.md)
-- Modelo de dados: [`docs/modelo-de-dados.md`](docs/modelo-de-dados.md)
-- Testes e qualidade: [`docs/testes-e-qualidade.md`](docs/testes-e-qualidade.md)
-- Decisões e aspectos relevantes: [`docs/decisoes-tecnicas.md`](docs/decisoes-tecnicas.md)
-- Planejamento (critérios/marcos): [`docs/planejamento/`](docs/planejamento/)
+Toda a documentação está em [`docs/`](docs/README.md).
 
-## Estrutura do repositório
-
-```text
-Projeto-Final+praTI/
-├── backend/      # API Spring Boot (Java 21)
-├── frontend/     # SPA React + TypeScript (Vite)
-├── database/     # Scripts/schema do banco
-├── docs/         # Documentação técnica e planejamento
-└── README.md
-```
-
-## Metodologia ágil e fluxo de desenvolvimento
-
-- Trabalho organizado em **marcos/etapas** e critérios de aceite (`docs/planejamento/criterios-de-aceite.md`, `docs/planejamento/milestones.md`).
-- Desenvolvimento em branches `feature/*`, `fix/*`, `docs/*` com integração via Pull Request para `main`.
-- Commits e revisões documentados no histórico do Git.
-- Detalhes do fluxo: [`docs/contribuicao.md`](docs/contribuicao.md)
-
-## Equipe
-
-| Integrante | Função |
-|---|---|
-| Diogo Scorsatto | Líder |
-| Clebson Oliveira | Desenvolvedor |
-| Maria Silva | Desenvolvedora |
-| Alexander Pereira | Desenvolvedor |
-| Esdras | Desenvolvedor |
-| Clóvis | Desenvolvedor |
-| Klaian | Desenvolvedor |
-
-## Licença
-Projeto acadêmico desenvolvido para fins educacionais.
+| Documento | Conteúdo |
+|-----------|----------|
+| [Índice da documentação](docs/README.md) | Guia de leitura e visão geral dos documentos |
+| [Visão geral](docs/visao-geral.md) | Problema, solução, público e escopo |
+| [Requisitos](docs/requisitos.md) | Requisitos funcionais, não funcionais e regras de negócio |
+| [Arquitetura](docs/arquitetura.md) | Componentes, camadas, fluxos e implantação |
+| [Modelo de dados](docs/modelo-de-dados.md) | Entidades, relacionamentos e PostGIS |
+| [API](docs/api.md) | Endpoints, autenticação, erros e exemplos |
+| [APIs externas](docs/apis-externas.md) | Open-Meteo, Nominatim, IBGE e tiles do OSM |
+| [Frontend](docs/frontend.md) | Estrutura React/TypeScript, rotas e componentes |
+| [Backend](docs/backend.md) | Estrutura Spring Boot, segurança e configuração |
+| [Instalação](docs/instalacao.md) | Execução local, Docker e troubleshooting |
+| [Deploy](docs/deploy.md) | nginx, containers, CI/CD e operação |
+| [Segurança e LGPD](docs/seguranca-e-lgpd.md) | Autenticação, RBAC, privacidade e retenção |
