@@ -1,7 +1,7 @@
 # Testes e qualidade
 
-Este documento descreve o que é validado automaticamente hoje, o checklist manual
-e as recomendações para evoluir a qualidade do projeto.
+Este documento descreve o que é validado automaticamente, como executar os testes
+e o checklist manual de qualidade do projeto.
 
 ---
 
@@ -10,8 +10,10 @@ e as recomendações para evoluir a qualidade do projeto.
 | Área | Automação | Observação |
 |------|-----------|------------|
 | Frontend — build | `npm run build` | `tsc` estrito + Vite |
-| Frontend — regra de linha do tempo | `npm run test:filter` | Script Node isolado |
-| Backend — compilação | `mvn -B verify` | Sem testes automatizados no repositório |
+| Frontend — testes unitários (Jest) | `npm test` / `npm run test:coverage` | Testes em `src/__tests__` com cobertura configurada (Jest + ts-jest) |
+| Frontend — regra de linha do tempo | `npm run test:filter` | Script Node isolado (validação adicional) |
+| Backend — testes unitários (JUnit) | `mvn test` | Testes JUnit 5 + Mockito em `src/test/java` (autenticação e CRUD/regras de negócio) |
+| Backend — cobertura | `mvn verify` | JaCoCo gera relatório e valida cobertura mínima configurada (>= 70%) |
 | API — contrato | Swagger/OpenAPI | Documentação viva em `/docs` |
 | Banco — schema | Hibernate `ddl-auto=update` | Sem migrações versionadas |
 
@@ -30,7 +32,21 @@ npm run build
 O `tsc` roda em modo estrito, com `noUnusedLocals` e `noUnusedParameters`. O build
 falha em caso de erro de tipo, import não usado ou parâmetro não utilizado.
 
-### 2.2 Teste da linha do tempo
+### 2.2 Testes unitários (Jest)
+
+```bash
+cd frontend
+npm install
+npm test
+npm run test:coverage
+```
+
+Os testes unitários do frontend utilizam **Jest** (com `ts-jest`) e ficam em
+`frontend/src/__tests__`. A suíte cobre lógica crítica da aplicação (ex.: roteamento
+e fluxos principais), e o projeto possui configuração de cobertura para geração de
+relatório e verificação de limiar mínimo.
+
+### 2.3 Teste da linha do tempo (script)
 
 ```bash
 npm run test:filter
@@ -47,7 +63,7 @@ define quais pontos aparecem no mapa conforme a janela de duas pontas:
 O script imprime `PASS`/`FAIL` por verificação e retorna código de erro se alguma
 falhar. São **8 verificações**.
 
-### 2.3 Verificação manual do SPA
+### 2.4 Verificação manual do SPA
 
 | Cenário | Resultado esperado |
 |---------|--------------------|
@@ -63,12 +79,19 @@ falhar. São **8 verificações**.
 
 ## 3. Backend
 
-### 3.1 Compilação
+### 3.1 Compilação e testes unitários (JUnit)
 
 ```bash
 cd backend
-mvn -B clean package
+mvn test
+mvn verify
 ```
+
+- `mvn test`: executa os testes unitários (**JUnit 5 + Mockito**) em `backend/src/test/java`,
+  cobrindo componentes críticos como autenticação e regras de negócio/CRUD de incidentes.
+- `mvn verify`: executa testes, gera relatório do **JaCoCo** e valida a cobertura mínima
+  configurada (>= 70%).
+- Relatório de cobertura: `backend/target/site/jacoco/index.html`.
 
 ### 3.2 Teste manual da API
 
@@ -126,19 +149,17 @@ Fluxo mínimo:
 
 ---
 
-## 5. Lacunas e recomendações
+## 5. Melhorias recomendadas (evolução)
 
-| Lacuna | Recomendação |
-|--------|--------------|
-| Sem testes de backend | Criar testes de unidade (services) e integração com Testcontainers + PostGIS |
-| Sem testes de componentes | Adicionar Vitest + Testing Library para fluxos críticos |
-| Sem testes E2E | Playwright cobrindo cadastro, registro e moderação |
-| Sem CI de testes | Workflow de `pull_request` rodando build e testes |
-| Sem cobertura medida | Configurar JaCoCo e meta mínima |
-| Sem migrações | Flyway/Liquibase com teste de schema |
-| Sem teste de carga | k6 ou Gatling nas consultas geoespaciais |
-| Sem análise estática no backend | Checkstyle/SpotBugs/Error Prone |
-| Sem lint no frontend | ESLint + Prettier |
+| Item | Recomendação |
+|------|--------------|
+| Testes de integração backend | Ampliar com testes de integração usando Testcontainers + PostGIS |
+| Testes de componentes/UI frontend | Adicionar testes de componentes (React Testing Library) para fluxos visuais |
+| Testes E2E | Playwright cobrindo cadastro, registro e moderação ponta a ponta |
+| CI de qualidade | Workflow de `pull_request` rodando build, testes e cobertura |
+| Migrações de banco | Adotar Flyway/Liquibase para versionamento de schema |
+| Teste de carga | k6 ou Gatling nas consultas geoespaciais |
+| Análise estática/lint | Checkstyle/SpotBugs no backend e ESLint/Prettier no frontend |
 
 ### Exemplo de teste de integração (esboço)
 

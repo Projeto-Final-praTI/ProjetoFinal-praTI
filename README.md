@@ -57,7 +57,7 @@ Detalhes das integrações externas em [`docs/apis-externas.md`](docs/apis-exter
 
 ## Estrutura do repositório
 
-```
+```text
 ProjetoFinal-praTI/
 ├── .github/          # Workflow de build e publicação do frontend
 ├── backend/          # API REST em Spring Boot
@@ -86,8 +86,7 @@ ProjetoFinal-praTI/
 ### 1. Banco de dados
 
 ```sql
-CREATE DATABASE zelo_db;
-\c zelo_db
+CREATE DATABASE zelo_db\(; \c\) zelo_db
 CREATE EXTENSION IF NOT EXISTS postgis;
 ```
 
@@ -139,6 +138,27 @@ Passo a passo completo, incluindo Docker e solução de problemas, em
 
 ---
 
+## Testes e cobertura
+
+### Backend (JUnit + cobertura JaCoCo)
+```bash
+cd backend
+mvn test          # executa testes unitários
+mvn verify        # executa testes + relatório + checagem de cobertura (>= 70%)
+```
+Relatório: `backend/target/site/jacoco/index.html`
+
+### Frontend (Jest)
+```bash
+cd frontend
+npm install
+npm test          # testes unitários
+npm run test:coverage
+npm run test:filter
+```
+
+---
+
 ## Documentação
 
 Toda a documentação está em [`docs/`](docs/README.md).
@@ -157,69 +177,3 @@ Toda a documentação está em [`docs/`](docs/README.md).
 | [Instalação](docs/instalacao.md) | Execução local, Docker e troubleshooting |
 | [Deploy](docs/deploy.md) | nginx, containers, CI/CD e operação |
 | [Segurança e LGPD](docs/seguranca-e-lgpd.md) | Autenticação, RBAC, privacidade e retenção |
-| [Testes e qualidade](docs/testes-e-qualidade.md) | Testes existentes, checklist manual e lacunas |
-| [Manual do usuário](docs/manual-do-usuario.md) | Uso por visitante, cidadão, moderador e gestor |
-| [Contribuição](docs/contribuicao.md) | Branches, commits, PRs e padrões de código |
-| [Decisões técnicas](docs/decisoes-tecnicas.md) | Registro das decisões de arquitetura (ADRs) |
-| [Planejamento](docs/planejamento/README.md) | Documentos originais e divergências em relação ao implementado |
-
-Documentação específica:
-
-- [`frontend/README.md`](frontend/README.md) — scripts e organização do frontend.
-- [`backend/README.md`](backend/README.md) — configuração e endpoints da API.
-- [`database/README.md`](database/README.md) — execução do schema e boas práticas.
-
----
-
-## Equipe
-
-| Integrante | Função |
-|------------|--------|
-| Diogo Scorsatto | Líder |
-| Clebson Oliveira | Desenvolvedor |
-| Maria Silva | Desenvolvedora |
-| Alexander Pereira | Desenvolvedor |
-| Esdras | Desenvolvedor |
-| Clóvis | Desenvolvedor |
-| Klaian | Desenvolvedor |
-
----
-
-## Contribuição
-
-- A branch `main` é protegida e recebe alterações por **Pull Request**.
-- Cada mudança nasce em uma branch `feature/...`, `fix/...` ou `docs/...`.
-- Use **Conventional Commits** (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
-- Antes do PR, rode os builds do frontend e do backend e atualize a documentação.
-
-Fluxo completo em [`docs/contribuicao.md`](docs/contribuicao.md).
-
----
-
-## Segurança
-
-- Nunca versione `.env`, senhas, tokens, chaves ou dumps de banco com dados reais.
-- Use variáveis de ambiente para configuração sensível (`DB_PASSWORD`,
-  `JWT_SECRET`).
-- O `JWT_SECRET` deve ter pelo menos 32 bytes e ser diferente em produção.
-- Consulte [`docs/seguranca-e-lgpd.md`](docs/seguranca-e-lgpd.md) antes de operar
-  com dados reais.
-
----
-
-## Status
-
-Projeto acadêmico em evolução. A versão atual cobre o fluxo completo de pontos
-críticos, alertas, desaparecidos e administração, com documentação técnica e
-script de banco versionados.
-
-Limitações conhecidas e próximos passos estão em
-[`docs/testes-e-qualidade.md`](docs/testes-e-qualidade.md) e
-[`docs/decisoes-tecnicas.md`](docs/decisoes-tecnicas.md).
-
----
-
-## Licença
-
-Projeto acadêmico desenvolvido para fins educacionais na trilha Dev. Full Stack
-2026 (+praTI & Codifica).
